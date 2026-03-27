@@ -40,7 +40,7 @@ function Navbar() {
           <Button title={"Logout"} size='small'  onClick={logoutUser}/>
         </div>
         ) : (
-          <div to="/login" className='bg-white text-red-600 px-2 py-1 rounded'>Login</div>
+          <Link to="/login" className='bg-white text-red-600 px-2 py-1 rounded'>Login</Link>
         )}
       </div>
       </div>
