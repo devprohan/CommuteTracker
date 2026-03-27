@@ -8,6 +8,7 @@ import Signup from './view/Signup'
 import Contact from './view/Contact'
 import About from './view/About'
 import MapLocator from './MapLocator'
+import Dashboard from './dashboard'
 
 const root = createRoot(document.getElementById('root'));
 
@@ -20,6 +21,7 @@ root.render(
     <Route path='/signup' element={<Signup />} />
     <Route path='/contact' element={<Contact />} />
     <Route path='/maplocator' element={<MapLocator />} />
+    <Route path='/dashboard' element={<Dashboard />} />
   </Routes>
   </BrowserRouter>
 )

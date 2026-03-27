@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import React, { useState, useMemo, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import propertyData from "./properties.json";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "./MapLocator.css"; 
+import "./MapLocator.css";
 
-// Fix for default Leaflet icons
+// Leaflet Icons Fix
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
@@ -24,78 +24,108 @@ const workplaceIcon = new L.Icon({
   iconAnchor: [12, 41],
 });
 
-function MapLocator() {
-  const workLocation = { lat: 21.1458, lng: 79.0882 };
+// 🔥 Helper component to move map when workplace changes
+function RecenterMap({ location }) {
+  const map = useMap();
+  useEffect(() => {
+    if (location) {
+      map.setView([location.lat, location.lng], 13, { animate: true });
+    }
+  }, [location, map]);
+  return null;
+}
+
+// Pass 'externalWorkplace' as a prop from Dashboard
+function MapLocator({ externalWorkplace }) {
+  // Use externalWorkplace if provided, otherwise fallback to Sitabuldi
+  const workLocation = useMemo(() => {
+    return externalWorkplace || { lat: 21.1458, lng: 79.0882, name: "Sitabuldi" };
+  }, [externalWorkplace]);
+
   const [maxTime, setMaxTime] = useState(25);
   const [mode, setMode] = useState("driving");
 
- const properties = useMemo(() => propertyData, []);
+  const properties = useMemo(() => propertyData, []);
 
-  const getDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371;
+  const getCommuteDetails = (lat1, lon1, lat2, lon2, travelMode) => {
+    const R = 6371; // Earth radius
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
     const dLon = ((lon2 - lon1) * Math.PI) / 180;
-    const a = Math.sin(dLat / 2) ** 2 +
+    const a =
+      Math.sin(dLat / 2) ** 2 +
       Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) ** 2;
-    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) ** 2;
+    const directDist = R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+    const roadDist = directDist * 1.2; // Road buffer
+
+    let multiplier = travelMode === "walking" ? 12 : travelMode === "biking" ? 4 : 3;
+    return Math.round(roadDist * multiplier);
   };
 
-  const filteredProperties = properties.map((p) => {
-    const dist = getDistance(workLocation.lat, workLocation.lng, p.lat, p.lng);
-    let multiplier = mode === "walking" ? 12 : mode === "biking" ? 5 : 3;
-    const commuteTime = Math.round(dist * multiplier);
-    return { ...p, commuteTime };
-  }).filter((p) => p.commuteTime <= maxTime);
+  const filteredProperties = useMemo(() => {
+    return properties
+      .map((p) => ({
+        ...p,
+        commuteTime: getCommuteDetails(workLocation.lat, workLocation.lng, p.lat, p.lng, mode),
+      }))
+      .filter((p) => p.commuteTime <= maxTime);
+  }, [properties, maxTime, mode, workLocation]);
 
   const getEmoji = (m) => (m === "driving" ? "🚗" : m === "walking" ? "🚶" : "🚲");
 
   return (
     <div className="app-container">
+      {/* Search Header inside MapLocator */}
       <header className="app-header">
-        <h2 style={{ margin: 0 }}>Nagpur Commute Search</h2>
+        <h2 style={{ margin: 0, fontSize: '1.2rem' }}>Nagpur Hubs</h2>
         <div className="header-controls">
-          <span>Mode:</span>
-          <select className="mode-select" value={mode} onChange={(e) => setMode(e.target.value)}>
-            <option value="driving">🚗 Driving</option>
-            <option value="biking">🚲 Biking</option>
-            <option value="walking">🚶 Walking</option>
-          </select>
-
-          <span style={{ marginLeft: "20px" }}>Max Commute:</span>
-          <input
-            className="range-input"
-            type="range" min="5" max="60"
-            value={maxTime}
-            onChange={(e) => setMaxTime(Number(e.target.value))}
-          />
-          <b className="time-display">{maxTime} min</b>
+          <div className="control-group">
+            <select className="mode-select" value={mode} onChange={(e) => setMode(e.target.value)}>
+              <option value="driving">🚗 Driving</option>
+              <option value="biking">🚲 Biking</option>
+              <option value="walking">🚶 Walking</option>
+            </select>
+          </div>
+          <div className="control-group">
+            <input
+              className="range-input"
+              type="range" min="5" max="60"
+              value={maxTime}
+              onChange={(e) => setMaxTime(Number(e.target.value))}
+            />
+            <b className="time-display">{maxTime} min</b>
+          </div>
         </div>
       </header>
 
       <div className="main-content">
         <div className="sidebar">
-          <p className="sidebar-info">Within <b>{maxTime} mins</b> via <b>{mode}</b></p>
+          <p className="sidebar-info">
+            Results for: <b>{workLocation.name || "Custom Location"}</b>
+          </p>
           <hr />
-          {filteredProperties.map((p) => (
-            <div key={p.id} className="property-card">
-              <div className="property-name">{p.name}</div>
-              <div className="property-price">{p.price}</div>
-              <div className="commute-info">
-                {getEmoji(mode)} Est. Commute: <b>{p.commuteTime} mins</b>
+          <div className="property-list">
+            {filteredProperties.map((p) => (
+              <div key={p.id} className="property-card">
+                <div className="property-name">{p.name}</div>
+                <div className="property-price">{p.price}</div>
+                <div className="commute-info">
+                  {getEmoji(mode)} <b>{p.commuteTime} mins</b>
+                </div>
               </div>
-            </div>
-          ))}
-          {filteredProperties.length === 0 && (
-            <p className="no-results">No flats found. Try increasing time or changing mode!</p>
-          )}
+            ))}
+          </div>
         </div>
 
-        <MapContainer center={[21.1458, 79.0882]} zoom={13} className="map-view">
+        <MapContainer center={[workLocation.lat, workLocation.lng]} zoom={13} className="map-view">
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          
+          {/* 🔥 This updates the map view when Dashboard changes workplace */}
+          <RecenterMap location={workLocation} />
+
           <Marker position={[workLocation.lat, workLocation.lng]} icon={workplaceIcon}>
-            <Popup><b>Workplace: Sitabuldi</b></Popup>
+            <Popup><b>Workplace: {workLocation.name}</b></Popup>
           </Marker>
 
           {filteredProperties.map((p) => (
@@ -103,7 +133,7 @@ function MapLocator() {
               <Popup>
                 <strong>{p.name}</strong><br />
                 Rent: {p.price}<br />
-                {getEmoji(mode)} {p.commuteTime} mins
+                {p.commuteTime} mins away
               </Popup>
             </Marker>
           ))}
