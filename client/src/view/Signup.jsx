@@ -5,6 +5,8 @@ import { Link } from 'react-router'
 import { useState } from 'react'
 import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 
 function Signup() {
   const [newUser, setNewUser] = useState({
@@ -34,7 +36,8 @@ function Signup() {
     }}
   return (
     <div>
-      <div className='w-95 block mx-auto mt-15 border border-gray-300 rounded px-4 py-6 shadow-md bg-white'>
+      <Navbar />
+      <div className='w-95 block mx-auto mt-15 border border-gray-300 rounded px-4 py-6 shadow-md bg-white mb-5'>
     <h2 className='text-2xl text-center mb-6 poppins-semibold-italic'>Create Your Account</h2>
       <Input 
       type={"text"}
@@ -71,6 +74,7 @@ function Signup() {
 
     <Link to="/login" className='text-blue-500 '>Already have an account? Login</Link>
     </div>
+    <Footer />
     <Toaster />
     </div>
   )

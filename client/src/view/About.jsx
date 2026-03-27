@@ -2,6 +2,7 @@
 import { MapPin, Clock, Home } from "lucide-react";
 import team from '../config/team';
 import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 
 const steps = [
   { icon: MapPin, title: "Enter Your Workplace", desc: "Type your office address and we'll use it as the center of your search." },
@@ -10,7 +11,9 @@ const steps = [
 ];
 
 const About = () => (
+    
   <div>
+    <Navbar />
     <section className="bg-primary py-16">
       <div className="container mx-auto px-4 text-center">
         <h1 className="font-display text-4xl md:text-5xl font-bold text-primary-foreground mb-4">About <span className="text-secondary">CommuteTracker</span></h1>

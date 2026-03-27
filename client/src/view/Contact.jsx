@@ -8,13 +8,18 @@ import Twitter from './../assets/contactImg/twitters.png'
 import Youtube from './../assets/contactImg/youtube.png'
 import SuggestionImg from './../assets/contactImg/sendsuggestion.png'
 import Button from '../components/Button'
+import Heading from '../components/Heading'
+import SubHeading from '../components/SubHeading'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 
 
 function Contact() {
   return (
     <div>
+      <Navbar />
       <div className=" mx-auto px-6 py-10">
-        <h1>Contact Us</h1>
+        <Heading text={"Contact Us"} />
 
         <div className='md:gap-10 md:mx-30 flex flex-col md:flex-row mt-3 mb-10'>
 
@@ -41,7 +46,7 @@ function Contact() {
           </Link>
         </div>
 
-        <h1>Follow us</h1>
+        <SubHeading text={"Follow Us On Social Media"} />
 
         <div className="flex gap-4 justify-center mt-3 mb-10">
           <Link to="https://www.facebook.com/"><img src={Facebook} alt='facebook' className='w-10 hover:scale-110 transition' /></Link>
@@ -51,7 +56,7 @@ function Contact() {
           <Link to="https://www.youtube.com/"><img src={Youtube} alt='Youtube' className='w-10 hover:scale-110 transition' /></Link>
         </div>
 
-        <h2>Location</h2>
+        <SubHeading text={"Location"} />
 
         <div className="mt-4 rounded-xl overflow-hidden shadow md:mx-10">
           <iframe
@@ -109,6 +114,7 @@ function Contact() {
           </div>
         </form>
       </div>
+      <Footer />
     </div>
   )
 }
