@@ -9,14 +9,14 @@ import { checkJWT } from "./middlewares/jwt.js";
 
 dotenv.config();
 const app = express();
-// app.use(express.json());
+app.use(express.json());
 app.use(cors());
 
 const PORT = process.env.PORT || 8020;
 
 app.get('/', getHealth)
-app.post('/signup', checkJWT, postSignUp)
-app.post('/login', checkJWT, postLogin)
+app.post('/signup', postSignUp)
+app.post('/login', postLogin)
 
 app.listen(PORT, () => {
     console.log(`Server is running on PORT: ${PORT}`);
