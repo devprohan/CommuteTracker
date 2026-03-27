@@ -48,7 +48,7 @@ const About = () => (
 
     <section className="container mx-auto px-4 py-16">
       <h2 className="font-display text-3xl font-bold text-center mb-12">Meet the Team</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
         {team.map((t) => (
           <div key={t.name} className="text-center">
             <img src={t.img} alt={t.name} className="w-28 h-28 rounded-full mx-auto mb-4 object-cover border-4 border-secondary/30" loading="lazy" />

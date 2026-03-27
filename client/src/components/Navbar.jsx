@@ -34,13 +34,13 @@ function Navbar() {
         </div> 
    
         {userData?.name ? (
-          <Link to="/dashboard" className='flex items-center'>
+          <div className='flex items-center'>
             <Avatar name={userData.name}/>
           <span className='text-sm md:text-lg mr-2'>Hello, {userData.name}</span>
           <Button title={"Logout"} size='small'  onClick={logoutUser}/>
-        </Link>
+        </div>
         ) : (
-          <Link to="/login" className='bg-white text-red-600 px-2 py-1 rounded'>Login</Link>
+          <div to="/login" className='bg-white text-red-600 px-2 py-1 rounded'>Login</div>
         )}
       </div>
       </div>
